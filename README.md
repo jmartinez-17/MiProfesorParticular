@@ -40,6 +40,9 @@ Una vez instalado todo, simplemente lanza la aplicación:
 
 `streamlit run app.py`
 
+## 🔎 Vista Previa
+![Vista previa de la aplicación](img/vistaPrevia.png)
+
 ## 📝 Notas sobre el Procesamiento de Documentos
 
 Esta aplicación está optimizada para documentos digitales con texto seleccionable (PDFs generados desde Word, Google Docs, etc). Los documentos escaneados o imágenes sin capa de texto no son compatibles para mantener la ligereza y portabilidad de la herramienta.
