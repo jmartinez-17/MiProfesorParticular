@@ -20,9 +20,9 @@ Para ejecutar este proyecto, necesitas tener instalado:
 
 1. Clona el repositorio:
 
-   `git clone [URL_DE_TU_REPOSITORIO]`
+   `git clone [https://github.com/jmartinez-17/MiProfesorParticular.git]`
 
-   `cd [NOMBRE_DEL_PROYECTO]`
+   `cd [MiProfesorParticular]`
 
 2. Crea y activa tu entorno virtual:
 
