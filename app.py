@@ -1,7 +1,5 @@
 import streamlit as st
 import os
-import easyocr
-from pdf2image import convert_from_path
 from langchain_ollama import ChatOllama, OllamaEmbeddings
 from langchain_community.document_loaders import PyPDFLoader, TextLoader, Docx2txtLoader
 from langchain_text_splitters import CharacterTextSplitter
@@ -11,12 +9,6 @@ from langchain_chroma import Chroma
 st.set_page_config(layout="wide", page_title="Profesor IA")
 st.markdown("""<style>.stAppDeployButton { display: none !important; }</style>""", unsafe_allow_html=True)
 
-# Inicializar EasyOCR (se ejecuta una sola vez)
-@st.cache_resource
-def load_ocr():
-    return easyocr.Reader(['es', 'en'])
-
-reader = load_ocr()
 llm = ChatOllama(model="llama3.2")
 embeddings = OllamaEmbeddings(model="nomic-embed-text")
 
@@ -24,28 +16,21 @@ embeddings = OllamaEmbeddings(model="nomic-embed-text")
 if "messages" not in st.session_state: st.session_state.messages = []
 if "docs" not in st.session_state: st.session_state.docs = []
 
-# --- FUNCIÓN DE LECTURA INTELIGENTE ---
+# --- FUNCIÓN DE LECTURA (Solo Texto) ---
 def procesar_archivo_inteligente(path):
-    texto = ""
-    # 1. Intento de carga estándar
-    if path.endswith('.pdf'):
-        loader = PyPDFLoader(path)
+    try:
+        if path.endswith('.pdf'): loader = PyPDFLoader(path)
+        elif path.endswith('.txt'): loader = TextLoader(path)
+        else: loader = Docx2txtLoader(path)
+        
         docs = loader.load()
         texto = "\n".join([d.page_content for d in docs])
-    elif path.endswith('.txt'):
-        texto = open(path, 'r', encoding='utf-8').read()
-    else:
-        loader = Docx2txtLoader(path)
-        texto = "\n".join([d.page_content for d in loader.load()])
-    
-    # 2. Si sigue vacío (ej: PDF escaneado), usar EasyOCR
-    if not texto.strip() and path.endswith('.pdf'):
-        images = convert_from_path(path)
-        for img in images:
-            resultado = reader.readtext(img, detail=0)
-            texto += " ".join(resultado) + "\n"
-            
-    return texto
+        
+        if not texto.strip():
+            return None # Señal de que no hay texto digital
+        return texto
+    except Exception as e:
+        return f"Error: {e}"
 
 # --- INTERFAZ ---
 with st.sidebar:
@@ -78,20 +63,20 @@ if prompt := st.chat_input("¿Qué quieres saber sobre tus documentos?"):
 
     with st.chat_message("assistant"):
         if st.session_state.docs:
-            try:
-                texto_limpio = procesar_archivo_inteligente(st.session_state.docs[0])
-                if not texto_limpio.strip():
-                    st.error("No se pudo extraer texto. Archivo ilegible.")
-                else:
-                    splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
-                    docs = splitter.create_documents([texto_limpio])
-                    db = Chroma.from_documents(docs, embeddings)
-                    contexto = "\n".join([d.page_content for d in db.similarity_search(prompt)])
-                    
-                    resp = llm.invoke(f"Basado en: {contexto}\n\nPregunta: {prompt}")
-                    st.markdown(resp.content)
-                    st.session_state.messages.append({"role": "assistant", "content": resp.content})
-            except Exception as e:
-                st.error(f"Error técnico: {e}")
+            texto_limpio = procesar_archivo_inteligente(st.session_state.docs[0])
+            
+            if texto_limpio is None:
+                st.error("No pude extraer texto. Por favor, asegúrate de que el PDF contenga texto seleccionable (no sea una imagen escaneada).")
+            elif "Error" in str(texto_limpio):
+                st.error(texto_limpio)
+            else:
+                splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
+                docs = splitter.create_documents([texto_limpio])
+                db = Chroma.from_documents(docs, embeddings)
+                contexto = "\n".join([d.page_content for d in db.similarity_search(prompt)])
+                
+                resp = llm.invoke(f"Basado en: {contexto}\n\nPregunta: {prompt}")
+                st.markdown(resp.content)
+                st.session_state.messages.append({"role": "assistant", "content": resp.content})
         else:
             st.warning("¡Sube un documento primero!")
