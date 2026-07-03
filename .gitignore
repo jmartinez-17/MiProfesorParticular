@@ -28,3 +28,7 @@ chroma_db/
 
 # Carpetas de datos subidos
 data/
+
+# Carpetas de pruebas y bases de datos locales a ignorar
+chroma_db_web/
+temp_upload/
