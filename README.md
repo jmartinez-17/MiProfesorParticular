@@ -13,32 +13,32 @@ Esta aplicación es un asistente educativo diseñado para leer, procesar y respo
 
 Para ejecutar este proyecto, necesitas tener instalado:
 
-1. Ollama (con el modelo llama3.2 descargado: ´llama3.2 pull llama3.2´).
+1. Ollama (con el modelo llama3.2 descargado: `llama3.2 pull llama3.2`).
 2. Python 3.10 o superior.
 
 ## ⚙️ Instalación
 
 1. Clona el repositorio:
 
-   git clone [URL_DE_TU_REPOSITORIO]
+   `git clone [URL_DE_TU_REPOSITORIO]`
 
-   cd [NOMBRE_DEL_PROYECTO]
+   `cd [NOMBRE_DEL_PROYECTO]`
 
 2. Crea y activa tu entorno virtual:
 
-   ´python -m venv venv´
+   `python -m venv venv`
 
-   ´venv\Scripts\activate´
+   `venv\Scripts\activate`
 
 3. Instala las dependencias:
 
-   ´pip install -r requirements.txt´
+   `pip install -r requirements.txt`
 
 ## 🚀 Cómo ejecutarlo
 
 Una vez instalado todo, simplemente lanza la aplicación:
 
-´streamlit run app.py´
+`streamlit run app.py`
 
 ## 📝 Notas sobre el Procesamiento de Documentos
 
