@@ -1,0 +1,27 @@
+# Entorno virtual
+venv/
+.venv/
+env/
+.env
+
+# Archivos de configuración de Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Carpetas de bases de datos locales (si usamos ChromaDB)
+chroma/
+chroma_db/
+
+# Archivos de sistema / IDE
+.DS_Store
+.vscode/
+.idea/
+
+# Archivos de entorno y secretos
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
